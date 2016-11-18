@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title></title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/0.7.22/webcomponents.min.js"></script>
+<link rel="import" href="../eg-renderer.html">
+<style>
+body {
+  margin: 0;
+}
+</style>
+</head>
+<body>
+<eg-renderer id="renderer"></eg-renderer>
+<script>
+let egRenderer = document.getElementById('renderer')
+
+window.addEventListener('WebComponentsReady', () => {
+  const graph = egRenderer.graph()
+  const [a, b, c] = [0, 1, 2]
+  graph.addVertex(a)
+  graph.addVertex(b)
+  graph.addVertex(c)
+  graph.addEdge(a, b)
+  graph.addEdge(a, c)
+  graph.addEdge(b, c)
+
+  egRenderer.layouter()
+    .vertexWidth(() => 150)
+    .vertexHeight(() => 20)
+    .layerMargin(50)
+    .vertexMargin(30)
+
+  egRenderer
+    .resize(window.innerWidth - 15, window.innerHeight - 15)
+    .layout('hierarchy')
+    .transitionDuration(2000)
+    .center()
+})
+
+window.addEventListener('resize', (event) => {
+  egRenderer.resize(window.innerWidth - 15, window.innerHeight - 15)
+})
+</script>
+</body>
+</html>
