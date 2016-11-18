@@ -68,12 +68,12 @@ const lineGeometry = (points) => {
     const p21y = p2y - p1y
     const s1 = norm(p01x, p01y)
     const s2 = norm(p21x, p21y)
-    if (s1 === 0 || s2 === 0) {
+    const sx = p01x / s1 + p21x / s2
+    const sy = p01y / s1 + p21y / s2
+    if (s1 === 0 || s2 === 0 || norm(sx, sy) === 0) {
       result.push(Array.from(result[result.length - 2]))
       result.push(Array.from(result[result.length - 2]))
     } else {
-      const sx = p01x / s1 + p21x / s2
-      const sy = p01y / s1 + p21y / s2
       const theta = Math.acos((p01x * p21x + p01y * p21y) / s1 / s2)
       const r = width / Math.sin(theta / 2) / norm(sx, sy) / 2
       const [q01x, q01y] = orthogonalVector([p01x, p01y])
