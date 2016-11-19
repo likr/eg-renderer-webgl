@@ -34,13 +34,13 @@ const orthogonalVector = ([vx, vy]) => {
   const x = Math.sqrt(vy2 / (vx2 + vy2))
   const y = -x * vx / vy
   if (vx >= 0 && vy >= 0) {
-    return [-x, -y]
+    return [-x, y]
   } else if (vx >= 0 && vy <= 0) {
-    return [x, y]
+    return [x, -y]
   } else if (vx <= 0 && vy >= 0) {
-    return [-x, -y]
+    return [-x, y]
   } else {
-    return [x, y]
+    return [x, -y]
   }
 }
 
@@ -55,8 +55,8 @@ const lineGeometry = (points) => {
     const [p1x, p1y] = points[0]
     const [p2x, p2y] = points[1]
     const [ux, uy] = orthogonalVector([p2x - p1x, p2y - p1y])
-    result.push([ux * width / 2 + p1x, uy * width / 2 + p1y])
     result.push([-ux * width / 2 + p1x, -uy * width / 2 + p1y])
+    result.push([ux * width / 2 + p1x, uy * width / 2 + p1y])
   }
   for (let j = 1; j < points.length - 1; ++j) {
     const [p0x, p0y] = points[j - 1]
@@ -76,9 +76,7 @@ const lineGeometry = (points) => {
     } else {
       const theta = Math.acos((p01x * p21x + p01y * p21y) / s1 / s2)
       const r = width / Math.sin(theta / 2) / norm(sx, sy) / 2
-      const [q01x, q01y] = orthogonalVector([p01x, p01y])
-      const t = (p01x * p2y - p01y * p2x) / (p01x * q01y - p01y * q01x)
-      if (t > 0) {
+      if (sy > 0) {
         result.push([-r * sx + p1x, -r * sy + p1y])
         result.push([r * sx + p1x, r * sy + p1y])
       } else {
@@ -91,8 +89,8 @@ const lineGeometry = (points) => {
     const [p0x, p0y] = points[points.length - 2]
     const [p1x, p1y] = points[points.length - 1]
     const [ux, uy] = orthogonalVector([p1x - p0x, p1y - p0y])
-    result.push([ux * width / 2 + p1x, uy * width / 2 + p1y])
     result.push([-ux * width / 2 + p1x, -uy * width / 2 + p1y])
+    result.push([ux * width / 2 + p1x, uy * width / 2 + p1y])
   }
   return result
 }

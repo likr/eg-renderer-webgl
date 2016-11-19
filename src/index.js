@@ -125,6 +125,12 @@ class EgRenderer extends window.HTMLElement {
           while (points.length < 6) {
             points.push(points[points.length - 1])
           }
+          if (points[0][0] === points[1][0] && points[0][1] === points[1][1]) {
+            points[0][0] -= 10
+          }
+          if (points[4][0] === points[5][0] && points[4][1] === points[5][1]) {
+            points[5][0] += 10
+          }
           layoutResult.edges[u][v].type = 'hierarchy'
         }
         break
