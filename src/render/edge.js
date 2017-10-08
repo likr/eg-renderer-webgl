@@ -25,72 +25,49 @@ const edgeShaderProgram = (gl) => {
   return initProgram(gl, vertexShader, fragmentShader)
 }
 
-const orthogonalVector = ([vx, vy]) => {
-  if (vy === 0) {
-    return [0, 1]
-  }
-  const vx2 = vx * vx
-  const vy2 = vy * vy
-  const x = Math.sqrt(vy2 / (vx2 + vy2))
-  const y = -x * vx / vy
-  if (vx >= 0 && vy >= 0) {
-    return [-x, y]
-  } else if (vx >= 0 && vy <= 0) {
-    return [x, -y]
-  } else if (vx <= 0 && vy >= 0) {
-    return [-x, y]
-  } else {
-    return [x, -y]
-  }
-}
-
-const norm = (x, y) => {
-  return Math.sqrt(x * x + y * y)
-}
-
 const lineGeometry = (points) => {
   const result = []
   const width = 3
   {
     const [p1x, p1y] = points[0]
     const [p2x, p2y] = points[1]
-    const [ux, uy] = orthogonalVector([p2x - p1x, p2y - p1y])
-    result.push([-ux * width / 2 + p1x, -uy * width / 2 + p1y])
-    result.push([ux * width / 2 + p1x, uy * width / 2 + p1y])
+    const theta1 = Math.atan2(p2y - p1y, p2x - p1x)
+    result.push([
+      width / Math.sqrt(2) * Math.cos(theta1 + 3 * Math.PI / 4) + p1x,
+      width / Math.sqrt(2) * Math.sin(theta1 + 3 * Math.PI / 4) + p1y
+    ])
+    result.push([
+      width / Math.sqrt(2) * Math.cos(theta1 - 3 * Math.PI / 4) + p1x,
+      width / Math.sqrt(2) * Math.sin(theta1 - 3 * Math.PI / 4) + p1y
+    ])
   }
   for (let j = 1; j < points.length - 1; ++j) {
-    const [p0x, p0y] = points[j - 1]
-    const [p1x, p1y] = points[j]
-    const [p2x, p2y] = points[j + 1]
-    const p01x = p0x - p1x
-    const p01y = p0y - p1y
-    const p21x = p2x - p1x
-    const p21y = p2y - p1y
-    const s1 = norm(p01x, p01y)
-    const s2 = norm(p21x, p21y)
-    const sx = p01x / s1 + p21x / s2
-    const sy = p01y / s1 + p21y / s2
-    if (s1 === 0 || s2 === 0 || norm(sx, sy) === 0) {
-      result.push(Array.from(result[result.length - 2]))
-      result.push(Array.from(result[result.length - 2]))
-    } else {
-      const theta = Math.acos((p01x * p21x + p01y * p21y) / s1 / s2)
-      const r = width / Math.sin(theta / 2) / norm(sx, sy) / 2
-      if (sy > 0) {
-        result.push([-r * sx + p1x, -r * sy + p1y])
-        result.push([r * sx + p1x, r * sy + p1y])
-      } else {
-        result.push([r * sx + p1x, r * sy + p1y])
-        result.push([-r * sx + p1x, -r * sy + p1y])
-      }
-    }
+    const [p1x, p1y] = points[j - 1]
+    const [p2x, p2y] = points[j]
+    const [p3x, p3y] = points[j + 1]
+    const theta1 = Math.atan2(p2y - p1y, p2x - p1x)
+    const theta2 = Math.atan2(p3y - p2y, p3x - p2x)
+    result.push([
+      width / Math.cos((theta1 - theta2) / 2) / 2 * Math.cos((theta1 + theta2 + Math.PI) / 2) + p2x,
+      width / Math.cos((theta1 - theta2) / 2) / 2 * Math.sin((theta1 + theta2 + Math.PI) / 2) + p2y
+    ])
+    result.push([
+      width / Math.cos((theta1 - theta2) / 2) / 2 * Math.cos((theta1 + theta2 - Math.PI) / 2) + p2x,
+      width / Math.cos((theta1 - theta2) / 2) / 2 * Math.sin((theta1 + theta2 - Math.PI) / 2) + p2y
+    ])
   }
   {
-    const [p0x, p0y] = points[points.length - 2]
-    const [p1x, p1y] = points[points.length - 1]
-    const [ux, uy] = orthogonalVector([p1x - p0x, p1y - p0y])
-    result.push([-ux * width / 2 + p1x, -uy * width / 2 + p1y])
-    result.push([ux * width / 2 + p1x, uy * width / 2 + p1y])
+    const [p2x, p2y] = points[points.length - 2]
+    const [p3x, p3y] = points[points.length - 1]
+    const theta2 = Math.atan2(p3y - p2y, p3x - p2x)
+    result.push([
+      width / Math.sqrt(2) * Math.cos(theta2 + Math.PI / 4) + p3x,
+      width / Math.sqrt(2) * Math.sin(theta2 + Math.PI / 4) + p3y
+    ])
+    result.push([
+      width / Math.sqrt(2) * Math.cos(theta2 - Math.PI / 4) + p3x,
+      width / Math.sqrt(2) * Math.sin(theta2 - Math.PI / 4) + p3y
+    ])
   }
   return result
 }
